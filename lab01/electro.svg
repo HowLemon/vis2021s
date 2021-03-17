@@ -43,7 +43,7 @@
   <text x="438" y="12" font-size="12" text-anchor="start" fill="red">448</text>
   <text x="492" y="12" font-size="12" text-anchor="start" fill="red">512</text>
 
-  <rect x=5 y=125 width="383" height="257" fill="none" stroke="red" stroke-width=5px />
+  <rect x="5" y="125" width="383" height="257" fill="none" stroke="red" stroke-width="5px" />
   <line x1="5" y1="234" x2="113" y2="234" style="stroke: red;stroke-width: 5px"/>
   <line x1="279" y1="234" x2="386" y2="234" style="stroke: red;stroke-width: 5px"/>
   <path d="M192 127
