@@ -46,7 +46,11 @@
 <pattern id="bmp" x="0" y="0" width="1" height="1"
              viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
       <image x="0" y="0" width="100" height="100" xlink:href="https://www.scandinavian.house/wp-content/uploads/Material-Metal-Scandinavian-House-Stainless-steel.jpg"/>
-    </pattern>
+</pattern>
+<pattern id="bmp2" x="0" y="0" width="1" height="1"
+             viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+      <image x="0" y="0" width="100" height="100" xlink:href="https://thumbs.dreamstime.com/b/texture-green-electronic-plate-12210729.jpg"/>
+</pattern>
 </defs>
 
   <rect x="5" y="125" width="383" height="257" fill="url(#bmp)" stroke="red" stroke-width="5px" />
@@ -77,7 +81,7 @@ q -10 20 -30 40
 q -30 20 -25 45
 q 30 20 50 -45
 " stroke="red"
-  stroke-width="5" fill="none" />
+  stroke-width="5" fill="url(#bmp2)" />
 
 <path d="
 M 250 400 
@@ -85,7 +89,7 @@ q 10 20 30 40
 q 30 20 25 45
 q -30 20 -50 -45
 " stroke="red"
-  stroke-width="5" fill="none" />
+  stroke-width="5" fill="url(#bmp2)" />
 
 <path d="
 M 135 440 
