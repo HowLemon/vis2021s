@@ -42,8 +42,14 @@
   <path d="M448  0 V512" stroke="lightgray" fill="white"></path>
   <text x="438" y="12" font-size="12" text-anchor="start" fill="red">448</text>
   <text x="492" y="12" font-size="12" text-anchor="start" fill="red">512</text>
+<defs>
+<pattern id="bmp" x="0" y="0" width="1" height="1"
+             viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+      <image x="0" y="0" width="100" height="100" xlink:href="https://www.scandinavian.house/wp-content/uploads/Material-Metal-Scandinavian-House-Stainless-steel.jpg"/>
+    </pattern>
+</defs>
 
-  <rect x="5" y="125" width="383" height="257" fill="none" stroke="red" stroke-width="5px" />
+  <rect x="5" y="125" width="383" height="257" fill="url(#bmp)" stroke="red" stroke-width="5px" />
   <line x1="5" y1="234" x2="113" y2="234" style="stroke: red;stroke-width: 5px"/>
   <line x1="279" y1="234" x2="386" y2="234" style="stroke: red;stroke-width: 5px"/>
   <path d="M192 127
