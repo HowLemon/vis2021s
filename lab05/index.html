@@ -1,14 +1,235 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW">
-  <head>
-    <meta charset="utf-8">
-    <title>D3 Page Template</title>
-    <script src="http://d3js.org/d3.v6.min.js" charset="utf-8"></script> <!-- v6.5.0 -->
+
+<head>
+  <meta charset="utf-8">
+  <title>D3 Page Template</title>
+  <script src="d3.v6.min.js" charset="utf-8"></script> <!-- v6.5.0 -->
+  <script src="Smooth-0.1.7.js"></script>
+  <style>
+    .limiter{
+      margin: 0;
+      padding: 0;
+      display: block;
+      height: 650px;
+      overflow-y:hidden;
+    }
+    .container {
+      display: table;
+      width: 95%;
+      height: 600px;
+      border:1px black solid;
+    }
+    .container > .bar{
+      display: table-cell;
+      position: relative;
+      bottom: 0;
+      border-left: 5px;
+      padding: 1px;
+      vertical-align: bottom;
+    }
+
+    .bar > div{
+      display: flex;
+    }
+
+    .bar .content{
+      width: 100%;
+      align-self: flex-end;
+      bottom: 0;
+      display: block;
+      /*border:1px black solid;*/
+      background-color: #82cedf;
+      animation-name:stretchIn;
+      animation-duration:1.5s;
+      height: 100%;
+      transition-property: transform, background-color;
+      transition-duration: 0.5s;
+    }
+
+    .content::before{
+      content:"";
+      transition-property: height, background-color, transform;
+      transition-duration: 0.4s;
+      height: 0;
+      transform: skewX(-45deg);
+      display: block;
+      background-color: #48c5ff;
+    }
+
+    .bar:hover .content{
+      transition-property: transform, background-color;
+      transition-duration: 0.4s;
+      background-color: #2f9aff;
+      transform: translate(-10px,10px);
+    }
+
+    .bar:hover .content::before{
+      content:"";
+      transition-property: height, background-color, transform;
+      transition-duration: 0.4s;
+      transform: translate(5px,-10px) skewX(-45deg);
+      width: 100%;
+      height: 10px;
+    }
+
+    .bar .content::after{
+      transition-property: width, background-color, transform;
+      transition-duration: 0.4s;
+      content:"";
+      position: absolute;
+      display: block;
+      background-color: #276e8f;
+      width: 0px;
+      height: 100%;
+      max-height: 100%;
+      right:0;
+      transform: translate(0,0) skewY(-45deg);
+    }
+
+    .bar:hover .content::after{
+      transition-property: width, background-color, transform;
+      transition-duration: 0.4s;
+      position: absolute;
+      background-color: #005aae;
+      width: 10px;
+      max-height: 100%;
+      right:0;
+      transform: translate(10px,-15px) skewY(-45deg);
+    }
+
+
+    .bar > label.dim{
+      position: absolute;
+      width: 100%;
+      text-align: center;
+    }
+
+    .bar > .freq{
+      display: inline-block;
+      top: -20px;
+      position: relative;
+      width: 100%;
+      overflow-x: visible;
+    }
+
+    .freq > label{
+      transition-duration: 500ms;
+      transition-property: opacity;
+      opacity: 0;
+      position: absolute;
+      min-width: 100%;
+      text-align: center;
+      z-index: 99999;
+      pointer-events: none;
+      background-color: white;
+    }
+    .bar:hover > .freq > label{
+      opacity: 100;
+    }
+
+    .bar:not(:hover) .content,.bar:not(:hover) .content::after,.bar:not(:hover) .content::before{
+      transition-delay: 0.2s;
+    }
+
+    @keyframes stretchIn{
+    from{
+        height:0;
+    }
+    to{
+      height:100%;
+    }
+}
+  </style>
 </head>
+
 <body>
-    <script type="text/javascript">
-      // Your beautiful D3 code will go here
-    </script>
-  </body>
+  <div class="limiter">
+  <div class="container">
+
+  </div>
+</div><br><Br>
+  <input type="range" min="5" max="100" value="50" onchange="sliderChange(this)" onmousemove="updateLabel(this)">
+  <label id="perc">調整精度</label>
+  <script type="text/javascript">
+  Array.prototype.insert = function ( index, item ) {
+    this.splice( index, 0, item );
+};
+    // Your beautiful D3 code will go here
+    var container = d3.select(".container");
+    var rowCount = 0;
+    var bars = [];
+    var origData = [];
+    var processData = [];
+    var smoothData = [];
+    var s
+
+    d3.csv("data.csv",(data)=>{
+      origData.push(data);
+      smoothData.push(parseInt(data["頻率"]));
+    }).then((data_all)=>{
+      processData = origData;
+      s = Smooth(smoothData, { scaleTo:smoothData.length-1 });
+      console.log(processData);
+      renderData(processData);
+    });
+
+    function subDivide(percision){
+        processData = []
+        for(var i=0;i<origData.length;i+=percision){
+          value = Math.max(0,s(i));
+          value = Math.round(value * 100) / 100;
+          if(Math.abs(i - parseInt(i)) < 0.1){
+            processData.push({"頻率" : value,"組界": origData[parseInt(i)]["組界"]});
+          }else{
+            processData.push({"頻率" : value});
+          }
+        }
+        renderData(processData)
+    }
+
+    
+
+    function renderData(datas){
+      container.html("");
+      datas.forEach((data) => {
+      rowCount++;
+      var bar = container.append("div")
+      bar.attr("class","bar");
+
+      bar
+      .append("div")
+      .attr("class","freq")
+      .append("label")
+      .html(data["頻率"]);
+
+      bar.append("div")
+      .attr("style","height:"+data["頻率"] * 10+"px")
+      .append("div")
+      .attr("class","content")
+      ;
+
+      bar.append("label")
+      .attr("class","dim")
+      .html(data["組界"]);
+      bars.push(bar);
+    });
+    }
+
+    function sliderChange(el){
+      var vl = el.value / 50;
+      console.log(vl);
+      subDivide(vl);
+    }
+    var label = document.getElementById("perc");
+    function updateLabel(el){
+      label.innerHTML = "精度: "+(el.value / 50);
+    }
+
+    function Appear(){
+
+    }
+  </script>
+</body>
+
 </html>
-  

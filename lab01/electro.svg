@@ -97,7 +97,7 @@ q -20 20 -10 35
 q 10 30 30 23
 q 30 -50 -20 -58z
 " stroke="red"
-  stroke-width="5" fill="none" />
+  stroke-width="5" fill="url(#bmp2)" />
 
 <path d="
 M 250 440 
@@ -105,7 +105,7 @@ q 20 20 10 35
 q -10 30 -30 23
 q -30 -50 20 -58z
 " stroke="red"
-  stroke-width="5" fill="none" />
+  stroke-width="5" fill="url(#bmp2)" />
 
 <line x1="160" y1="490" x2="225" y2="490" style="stroke: red;stroke-width: 5px"/>
 

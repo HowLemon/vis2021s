@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lab 7</title>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v6.min.js" charset="utf-8"></script>
+    <script src="d3-interpolate-path.min.js" charset="utf-8"></script>
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        #target svg {
+            height: 300px;
+        }
+        #target:empty::before{
+            content: "Loading...";
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LAB 7</h1>
+    <svg class="hidden">
+        <path id="tmp"></path>
+        <path id="tmpCircle" d="
+        M 200, 300
+        a 400,400 0 1,0 800,0
+        a 400,400 0 1,0 -800,0
+        " />
+    </svg>
+    <div id="target"></div>
+    <input placeholder="可自訂輸入" onchange="document.querySelector('#target').innerHTML = '';appendText(this.value)">
+</body>
+<script>
+    var circle = d3.path();
+    var fontData;
+    var smileData;
+
+    async function init() {
+        let loadData = await d3.xml("fonts.svg");
+        var wtf = d3.pathCommandsFromString(document.querySelector("#tmpCircle").getAttribute("d"));
+
+        //console.log(wtf);
+        fontData = loadData;
+        flatten(document.getElementById("tmpCircle"), 500);
+        smileData = document.getElementById("tmpCircle").getAttribute("d");
+        appendText("彭敘豪");
+        setInterval(transitionChar, 5000);
+    }
+
+
+    var lengthList = {
+        "m": 2, "l": 2, "h": 1, "v": 1, "c": 6, "s": 4, "q": 4, "t": 2
+    };
+    function scaleSVG(rawData, scaleX, scaleY) {
+        //console.log(rawData);
+        scaleX = parseFloat(scaleX);
+        scaleY = parseFloat(scaleY);
+        var rawArray = rawData.split(/(?=[MLHVCSQTAZmlhvcsqtaz])/);
+        var output = "";
+        rawArray.forEach(el => {
+            var type = el.charAt(0).toLowerCase();
+            var data = el.substring(1).split(" ").map(x => parseFloat(x));
+            //console.log(type, data);
+            switch (type) {
+                case "a":
+                    output += `A ${data[0] * scaleX || ''} ${data[1] * scaleY || ''} ${data[2] || ''} ${data[3] || ''} ${data[4] || ''} ${data[5] * scaleX || ''} ${data[6] * scaleY || ''} `;
+                    break;
+                case "z":
+                    output += "z ";
+                    break;
+                default:
+                    output += type + " ";
+                    for (var i = 0; i < lengthList[type]; i++) {
+                        //console.log(data[i])
+                        if (i % 2 == 0) {
+                            output += ((data[i] * scaleX) || '') + " ";
+                        } else {
+                            output += ((data[i] * scaleY) || '') + " ";
+                        }
+                    }
+                    break;
+            }
+        });
+        return output;
+    }
+
+    function transitionChar() {
+        d3.selectAll("#target svg path")
+            .transition()
+            .duration(1000)
+            .attrTween('d', function () {
+                ////console.log(this);
+                this.classList.toggle("circle");
+                if (!this.classList.contains("circle")) {
+                    return d3.interpolatePath(smileData, this.getAttribute("bk"));
+                } else {
+                    return d3.interpolatePath(this.getAttribute("bk"), smileData);
+                }
+
+            });
+    }
+
+
+
+    function appendChar(text) {
+        var charcode = text.charCodeAt(0).toString(16).toUpperCase()
+        ////console.log(charcode);
+        var glyph = fontData.querySelector("defs font").querySelector("glyph[glyph-name='uni" + charcode + "']") || fontData.querySelector("defs font").querySelector("glyph[glyph-name='" + text + "']") || fontData.querySelector("defs font").querySelector("glyph[glyph-name='question']");
+        var dd = glyph.getAttribute("d");
+        var ex = glyph.getAttribute("horiz-adv-x");
+        ////console.log(ex);
+        ex = parseInt(ex) || 1024;
+        var compiled = "";
+        compiled = renderSVG(dd);
+        var target = createSVG(compiled, ex);
+        ////console.log(target)
+        document.getElementById("target").appendChild(target);
+    }
+
+    function appendText(text) {
+        var i = 0;
+        while (text.charAt(i) != "") {
+            ////console.log(i,text.charAt(i));
+            appendChar(text.charAt(i));
+            i++;
+        }
+    }
+
+    function renderSVG(dd) {
+        var sp = dd.split(/(?=[Mm])/);
+        //console.log(sp);
+        var compiled = "";
+        sp.forEach(element => {
+            var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            try {
+                path.setAttribute("d", element);
+                document.getElementsByClassName("hidden")[0].appendChild(path);
+                flatten(path, element.length)
+                compiled += path.getAttribute("d");
+            } catch (err) {
+                //console.log("lol",err);
+            }
+
+        });
+        return compiled;
+    }
+
+    function createSVG(charsvg, ex) {
+        var em = 1024;
+        var svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        var pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+        pathEl.setAttribute('d', charsvg);
+        pathEl.setAttribute('bk', charsvg);
+        pathEl.setAttribute('fill', "none");
+        pathEl.setAttribute('stroke', "black");
+        pathEl.setAttribute('stroke-width', "10px");
+        pathEl.setAttribute('transform', 'translate(0,' + em + ') scale(1, -1)')
+        svgEl.setAttribute('viewBox', '0 200 ' + (ex * 1 + 100) + ' ' + (em * 1 + 0));
+        svgEl.appendChild(pathEl);
+
+        return svgEl;
+    }
+    function flatten(path, num, noEndConn) {
+        var l = path.getTotalLength()
+        var p = path.getPointAtLength(0)
+        var d = `M${p.x} ${p.y}`
+        for (var i = (l / num); i <= l; i += (l / num)) {
+            p = path.getPointAtLength(i)
+            d += `L${p.x} ${p.y}`
+        }
+        if (!noEndConn) {
+            path.setAttribute("d", d + "z")
+        }
+
+    }
+
+
+    init();
+
+</script>
+
+</html>
