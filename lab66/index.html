@@ -1,14 +1,248 @@
 <!DOCTYPE html>
-<html lang="zh-Hant-TW">
-  <head>
+
+<html>
+
+<head>
     <meta charset="utf-8">
-    <title>D3 Page Template</title>
-    <script src="http://d3js.org/d3.v6.min.js" charset="utf-8"></script> <!-- v6.5.0 -->
+
+    <style>
+        html,
+        body {
+            height: 200%;
+        }
+
+        #training-section,
+        #testing-section {
+            height: 100%;
+            overflow: hidden;
+
+        }
+
+        #training-section li p,
+        #testing-section li p{
+            font-size: 20px;
+        }
+
+        #train-vs-test {
+            height: 100%;
+            position: fixed;
+            max-width: 100%;
+        }
+
+        .padding {
+            height: 100%;
+        }
+
+        #right {
+            width: 60%;
+            height: 100%;
+            position: relative;
+            float: right;
+        }
+
+        #left {
+            width: 40%;
+            height: 100%;
+            float: left;
+        }
+
+
+    </style>
 </head>
+
 <body>
-    <script type="text/javascript">
-      // Your beautiful D3 code will go here
+
+
+    <div id="right">
+        <div id="train-vs-test"></div>
+    </div>
+
+    <div id="left">
+        <div id="training-section">
+            <h1>
+                訓練資料集的部分
+                <p>
+                    能夠取得安全的飲用水對健康來說非常重要，同時也應是人類得以延續生命的基本權利。對於國家、地區或鄉村的發展來說也是相當切身的課題；在某些地區，可以發現投資水資源發展和淨化的行為間接減少了醫療和健保相關的需要花費，對當地的經濟有正面幫助。
+                </p>
+                內容:
+                <p>
+                    我們使用的資料集包含了3276個水體的水質資料。
+                <ol>
+                    <li>
+                        ph值
+                        <p>
+                            表示了水體的酸鹼值和水體的的酸度或鹼度，非常重要。世界衛生組織建議可接受的pH值為介於6.5至8.5之間，而目前調查水體的範圍為6.52到6.83之間，符合上述的建議。
+                        </p>
+                    </li>
+                    <li>
+                        硬度
+                        <p>
+                            表示水中的鈣質和鎂鹽的含量。通常是被水體流動時所經過的地質所影響。可以藉由觀察流動時所經過的特定地形來推算水體的硬度。原本定義為水質能夠溶解肥皂的程度。
+                        </p>
+
+                    </li>
+                    <li>
+                        溶解物(TDS)
+                        <p>
+                            由於水能夠溶解各種不同的物質，例如鉀、鈣、鈉、碳酸氫鈉、氯化物、鎂、硫酸鹽...等等，而這些物質可能會影響到水的顏色或是味道，因此非常重要。具有高TDS的水代表此水富含礦物質。可以飲用的水體的TDS應該介於500mg/l到1000mg/l之間。
+                        </p>
+                    </li>
+                    <li>
+                        氯胺
+                        <p>
+                            氯胺被廣泛的利用在大眾水資源系統的消毒上。能夠接受的最高限制為4mg/l。
+                        </p>
+                    </li>
+                    <li>
+                        硫酸鹽
+                        <p>
+                            硫酸鹽自然存在在礦物、泥土、石頭、空氣、植物、地下水和食物中。通常被化學工業所利用。在海中的硫酸鹽含量為2700mg/l，在淡水中為3~30ml/l，不過在某些請況也可能達到1000mg/l。
+                        </p>
+                    </li>
+                    <li>
+                        導電性
+                        <p>
+                            純水的導電性非常差，反之，有很好的絕緣性。提高水中的離子含量可以提高此數值。通常水中溶解物的濃度高低可以改變導電性。根據WHO標準，導電性不應超過400μS/cm。
+                        </p>
+                    </li>
+                    <li>
+                        有機碳
+                        <p>
+                            有機碳(TOC)是來自水中溶解的有機物或是人造物而來，表示水中的含碳有機物的濃度。跟據美國環境保護機構，可飲用水的最高限制為2mg/l，待處理水資源為4mg/l。
+                        </p>
+                    </li>
+                    <li>
+                        三鹵甲烷(THM)
+                        <p>
+                            三鹵甲烷通常出現在已用氯處理過的水中。三鹵甲烷的濃度會被水中存在有機物的數量，或是處理時所使用的氯濃度和當時溫度所影響。可飲用水的三鹵甲烷濃度的最高限制為80ppm。
+                        </p>
+                    </li>
+                    <li>
+                        濁度
+                        <p>
+                            表示在水中未溶解漂浮雜質或膠體物質的數量，利用測量水的透光性而成。由Wondo Genet Campus取得的平均濁度為0.98NTU，低於WHO建議標準的5.00NTU。
+                        </p>
+                    </li>
+                    <li>
+                        可飲用性
+                        <p>
+                            代表水是否為可以飲用的，1代表可飲用，0代表不可飲用。
+                        </p>
+                    </li>
+                </ol>
+                </p>
+
+            </h1>
+        </div>
+        <div id="testing-section">
+            <h1>
+                測試資料集的部分
+            </h1>
+            為了簡化流程，我們使用了資料集提供的測試資料前300筆的部分。
+        </div>
+    </div>
+
+
+
+
+    <script src="./lib/d3.v3.min.js"></script>
+    <script src="./lib/binarydecisiontree.min.js"></script>
+
+    <script>
+        //var Lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+        var Lipsum = "";
+        window.onload = function () {
+            function resizeRight() {
+                d3.select("#train-vs-test")
+                    .style("width", d3.select("#right").node().clientWidth + "px")
+                    ;
+            }
+
+            resizeRight();
+
+            d3.select(window)
+                .on("resize", function () { resizeRight() })
+                ;
+
+
+            /**
+             * 填版面，不然全部都是白色的很單調
+             * 這兩個 section 是要讓同學放說明資料和圖片的地方
+            */
+            d3.select("#training-section")
+                .selectAll("p")
+                .data(d3.range(1, 10))
+                .enter()
+                .append("p")
+                .text(Lipsum)
+                ;
+
+            d3.select("#testing-section")
+                .selectAll("p")
+                .data(d3.range(1, 10))
+                .enter()
+                .append("p")
+                .text(Lipsum)
+                ;
+            /*
+                        d3.select("#training-section")
+                            .selectAll("img")
+                            .data(d3.range(1, 4))
+                            .enter()
+                            .append("img")
+                            .attr("src", function (d) { return "media/" + d + ".png" })
+                            .style('height', '350px')
+                            .style('width', '350px')
+                            ;*/
+
+            d3.select("#testing-section")
+                .selectAll("img")
+                .data(d3.range(4, 7))
+                .enter()
+                .append("img")
+                .attr("src", function (d) { return "media/" + d + ".png" })
+                .style('height', '350px')
+                .style('width', '350px')
+                ;
+
+
+
+            var bdt = new BinaryDecisionTree({
+                el: "#train-vs-test",
+                trainingSection: "#training-section",
+                testSection: "#testing-section",
+
+                /**
+                 * 預設會讓小球在上方排排站
+                 * 如果不要排排站的話，必須要把這個 paramater 設成 false
+                 * 如果要排排站的話，直接註解掉這行就行
+                */
+                //flood: false
+            });
+
+            bdt.setDataFromJson("./dataset.json", function () {
+                bdt.install();
+                bdt.play();
+            })
+
+            /**
+             * or
+             * bdt.setDataFromObject({ 
+             *  tree_data: tree_data,
+             *  tree_training_set: tree_training_set,
+             *  tree_stats: tree_stats, 
+             *  tree_test_set: tree_test_set, 
+             *  test_stats : test_stats
+             * })
+             * 同步函式，不需要 callback
+             * bdt.install();
+             * bdt.play();
+            */
+        }
     </script>
-  </body>
+
+</body>
+
+
+
 </html>
-  
