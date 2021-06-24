@@ -1,14 +1,212 @@
 <!DOCTYPE html>
-<html lang="zh-Hant-TW">
-  <head>
-    <meta charset="utf-8">
-    <title>D3 Page Template</title>
-    <script src="http://d3js.org/d3.v6.min.js" charset="utf-8"></script> <!-- v6.5.0 -->
+<html>
+
+<head>
+    <script src="d3.v4.min.js" charset="utf-8"></script>
+    <title>LAB 09</title>
+    <style>
+        @font-face {
+            font-family: "notosans";
+            src: url("NotoSansTC-Medium.otf");
+        }
+
+        body
+
+        .hidden {
+            display: none;
+        }
+
+        .container {
+            position: relative;
+        }
+
+        video {
+            width: 960px;
+            height: 540px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .overlay {
+            position: absolute;
+            width: 960px;
+            height: 540px;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            pointer-events:none;
+            overflow: hidden;
+        }
+
+        .subtitle.hidden {
+            display: block;
+            transition-property: opacity top;
+            top: 110%;
+            transition-duration: 1s;
+            opacity: 0;
+        }
+
+        .subtitle::before.hidden{
+            transition-property: opacity width;
+            display: block;
+            opacity: 0.0;
+            position: absolute;
+            left:-10%;
+            width: 0;
+            height: 110%;
+            background-color: black;
+            content: "";
+            z-index: -1;
+        }
+
+
+
+        .subtitle {
+            transition-property: opacity, top;
+            transition-timing-function: ease;
+            opacity: 1;
+            transition-duration: 0.5s;
+            font-family: 'notosans';
+            font-size: 20px;
+            transform: translate(-50%, 0);
+            position: absolute;
+            color: white;
+            left: 50%;
+            top: 80%;
+            text-shadow:
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
+
+        }
+
+        .subtitle:not(.hidden) {
+            animation-name: expand;
+            animation-duration: 5s;
+        }
+
+        .subtitle::before{
+            transition-property: opacity width;
+            transition-duration: 0.7s;
+            display: block;
+            opacity: 0.7;
+            position: absolute;
+            left:-10%;
+            width: 120%;
+            height: 110%;
+            background-color: black;
+            content: "";
+            z-index: -1;
+        }
+
+        @keyframes expand {
+            from {
+                transform: scale(0.85) translate(-50%, 0);
+            }
+
+            to {
+                transform: scale(1) translate(-50%, 0);
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <script type="text/javascript">
-      // Your beautiful D3 code will go here
-    </script>
-  </body>
+    <h1>LAB 09</h1>
+    <div id="timestamp"></div>
+    <div class="container">
+        <video class="hidden" id="video" preload="auto" controls src="output.mp4">
+        </video>
+
+        <div class="overlay">
+
+
+        </div>
+    </div>
+
+
+</body>
+<script>
+    const video = document.querySelector("#video");
+    const overlay = document.querySelector(".overlay");
+    const timestamp = document.querySelector("#timestamp");
+    var subtitles = [];
+    d3.text("lyrics.srt", function (data) {
+        console.log(data);
+        var parsedCSV = data.split(/\r?\n/);
+        var lyrics = [];
+        for (var i = 0; i < parsedCSV.length - 1; i += 4) {
+            var time = parsedCSV[i + 1].split(" --> ").map(x => convertTimestamp(x));
+
+            var lyricObj = {
+                "order": parsedCSV[i],
+                "from": time[0],
+                "to": time[1],
+                "lyric": parsedCSV[i + 2]
+            }
+            lyrics.push(lyricObj);
+        }
+        console.log(lyrics);
+        video.classList.remove("hidden");
+        createSubtitles(lyrics);
+
+    });
+
+    function createSubtitles(obj) {
+        obj.forEach(element => {
+            var htmlElement = document.createElement("div");
+            htmlElement.innerHTML = element.lyric;
+            htmlElement.classList.add("hidden");
+            htmlElement.classList.add("subtitle");
+            htmlElement.dataset.from = element.from;
+            htmlElement.dataset.to = element.to;
+            htmlElement.dataset.order = element.order;
+            overlay.append(htmlElement);
+            subtitles.push(htmlElement);
+        });
+    }
+
+
+    function convertTimestamp(str) {
+        var tmp = str.split(",");
+
+        var ms = parseInt(tmp[1]);
+        var tmp2 = str.split(":").map(x => parseInt(x));
+        var s = tmp2[0] * 3600 + tmp2[1] * 60 + tmp2[2];
+        return ms + s * 1000;
+    }
+    /*
+    video.requestVideoFrameCallback(getCurrntplaytime);
+
+    function getCurrntplaytime(){
+        timestamp.innerHTML = video.currentTime;
+        video.requestVideoFrameCallback(doSomethingWithTheFrame);
+    }*/
+
+    const doSomethingWithTheFrame = (now, metadata) => {
+        // Do something with the frame.
+        console.log(metadata.mediaTime);
+        timestamp.innerHTML = metadata.mediaTime;
+        var mediaTime_ms = metadata.mediaTime * 1000;
+
+        subtitles.forEach(el => {
+            if (el.dataset.from <= mediaTime_ms && el.dataset.to >= mediaTime_ms) {
+                el.classList.remove("hidden");
+            } else {
+                el.classList.add("hidden");
+            }
+        })
+
+
+        // Re-register the callback to be notified about the next frame.
+        video.requestVideoFrameCallback(doSomethingWithTheFrame);
+    };
+    // Initially register the callback to be notified about the first frame.
+    video.requestVideoFrameCallback(doSomethingWithTheFrame);
+
+        //console.log(lyrics);
+</script>
+
 </html>
-  
