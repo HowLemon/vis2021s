@@ -4,6 +4,7 @@
 <head>
     <script src="d3.v4.min.js" charset="utf-8"></script>
     <title>LAB 09</title>
+    <meta charset="utf8">
     <style>
         @font-face {
             font-family: "notosans";
@@ -47,8 +48,9 @@
             opacity: 0;
         }
 
-        .subtitle::before.hidden{
-            transition-property: opacity width;
+        .subtitle.hidden::before{
+            transition-property: opacity width transform;
+            transform: translate(60%,0);
             display: block;
             opacity: 0.0;
             position: absolute;
@@ -88,8 +90,11 @@
         }
 
         .subtitle::before{
-            transition-property: opacity width;
-            transition-duration: 0.7s;
+            transition-property: opacity width transform;
+            transition-duration: 0.6s;
+            transition-delay: 0.5s;
+            transition-timing-function: ease;
+            transform: translate(0,0);
             display: block;
             opacity: 0.7;
             position: absolute;
